@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: osolodov <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/02/20 12:57:03 by osolodov          #+#    #+#             */
-/*   Updated: 2020/02/25 14:18:15 by osolodov         ###   ########.fr       */
+/*   Created: 2020/02/25 13:04:01 by osolodov          #+#    #+#             */
+/*   Updated: 2020/03/06 10:59:29 by osolodov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,6 @@
 
 void	ft_bzero(void *s, size_t n)
 {
-	unsigned char *str;
-
-	str = (unsigned char *)s;
 	while (n--)
-	{
-		*str = '\0';
-		str++;
-	}
+		*(unsigned char *)(s++) = 0;
 }
