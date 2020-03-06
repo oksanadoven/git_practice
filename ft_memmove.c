@@ -5,37 +5,36 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: osolodov <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/02/20 15:08:08 by osolodov          #+#    #+#             */
-/*   Updated: 2020/03/03 12:03:42 by osolodov         ###   ########.fr       */
+/*   Created: 2020/03/06 10:53:18 by osolodov          #+#    #+#             */
+/*   Updated: 2020/03/06 10:53:24 by osolodov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	*ft_memmove(void *dest, const void *src, size_t n)
+void	*ft_memmove(void *dst, const void *src, size_t len)
 {
-	const unsigned char	*s;
-	unsigned char		*d;
+	unsigned char	*copy_from;
+	unsigned char	*copy_to;
+	size_t			index;
 
-	s = (const unsigned char *)src;
-	d = (unsigned char *)dest;
-	if (dest == src)
-		return (dest);
-	else if (d > s)
+	if (!src && !dst)
+		return (dst);
+	copy_from = (unsigned char *)src;
+	copy_to = (unsigned char *)dst;
+	if (copy_from < copy_to)
 	{
-		d += n;
-		s += n;
-		while (n--)
-		{
-			d--;
-			s--;
-			*d = *s;
-		}
+		while (len--)
+			copy_to[len] = copy_from[len];
 	}
 	else
 	{
-		while (n--)
-			*d++ = *s++;
+		index = 0;
+		while (index < len)
+		{
+			copy_to[index] = copy_from[index];
+			index++;
+		}
 	}
-	return (dest);
+	return (dst);
 }
