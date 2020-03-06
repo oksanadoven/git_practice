@@ -6,7 +6,7 @@
 /*   By: osolodov <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/19 15:35:16 by osolodov          #+#    #+#             */
-/*   Updated: 2020/03/03 15:14:14 by osolodov         ###   ########.fr       */
+/*   Updated: 2020/03/06 11:01:54 by osolodov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,7 @@ char			*ft_itoa(int n);
 void			*ft_memalloc(size_t size);
 void			*ft_memchr(const void *s, int c, size_t n);
 void			*ft_memccpy(void *dest, const void *src, int c, size_t n);
-int				ft_memcmp(void *restrict dest, const void *restrict src,
-							size_t n);
+int				ft_memcmp(const void *s1, const void *s2, size_t n);
 void			*ft_memcpy(void *restrict dest, const void *restrict src,
 							size_t n);
 void			ft_memdel(void **ap);
