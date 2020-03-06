@@ -5,30 +5,29 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: osolodov <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/02/20 14:43:24 by osolodov          #+#    #+#             */
-/*   Updated: 2020/02/27 10:48:45 by osolodov         ###   ########.fr       */
+/*   Created: 2020/03/06 10:55:59 by osolodov          #+#    #+#             */
+/*   Updated: 2020/03/06 10:56:01 by osolodov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	*ft_memccpy(void *dest, const void *src, int c, size_t n)
+void	*ft_memccpy(void *restrict dst, const void *restrict src,
+		int c, size_t n)
 {
-	const unsigned char	*source;
-	unsigned char		*destination;
-	unsigned char		stop_char;
-	size_t				i;
+	unsigned char	*source;
+	unsigned char	*destination;
+	size_t			index;
 
-	source = (const unsigned char *)src;
-	destination = (unsigned char *)dest;
-	stop_char = (unsigned char)c;
-	i = 0;
-	while (i < n)
+	source = (unsigned char *)src;
+	destination = (unsigned char *)dst;
+	index = 0;
+	while (index < n)
 	{
-		destination[i] = source[i];
-		if (destination[i] == stop_char)
-			return (dest + i + 1);
-		i++;
+		destination[index] = source[index];
+		if (source[index] == (unsigned char)c)
+			return ((void *)(destination + index + 1));
+		index++;
 	}
 	return (NULL);
 }
