@@ -17,7 +17,7 @@
 # include <stdlib.h>
 # include "libft/libft.h"
 
-# define BUFF_SIZE 1
+# define BUFF_SIZE 4096
 
 # define ERROR -1
 # define READ_FINISHED 0

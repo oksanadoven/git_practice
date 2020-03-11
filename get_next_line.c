@@ -6,7 +6,7 @@
 /*   By: osolodov <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/06 14:18:12 by osolodov          #+#    #+#             */
-/*   Updated: 2020/03/10 13:03:40 by osolodov         ###   ########.fr       */
+/*   Updated: 2020/03/11 11:42:28 by osolodov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 ** in the course of the program execution
 */
 
-t_node	*create_el(int fd)
+t_node	*create_node(int fd)
 {
 	t_node	*new;
 
@@ -29,6 +29,37 @@ t_node	*create_el(int fd)
 	new->leftover = ft_strnew(BUFF_SIZE);
 	new->next = NULL;
 	return (new);
+}
+
+/*
+** Deletes the node if the fd was closed or if there's no more text in fd
+*/
+
+void	delete_node(t_node **head, t_node *delete)
+{
+	t_node	*current;
+	t_node	*prev;
+
+	current = *head;
+	prev = *head;
+	while (current)
+	{
+		if (current == delete)
+		{
+			if (current == *head)
+				*head = current->next;
+			else if (current->next == 0)
+				prev->next = NULL;
+			else
+			{
+				prev->next = current->next;
+				current = prev->next;
+			}
+			free(delete);
+		}
+		prev = current;
+		current = current->next;
+	}
 }
 
 /*
@@ -77,10 +108,10 @@ char	*find_nl(char *leftover, char **new_line_point)
 
 int		get_line(int fd, char **line, char *leftover)
 {
-	int				bytes_read;
-	char			buffer[BUFF_SIZE + 1];
-	char			*new_line_point;
-	char			*tmp;
+	int		bytes_read;
+	char	buffer[BUFF_SIZE + 1];
+	char	*new_line_point;
+	char	*tmp;
 
 	new_line_point = NULL;
 	*line = find_nl(leftover, &new_line_point);
@@ -117,17 +148,20 @@ int		get_next_line(const int fd, char **line)
 {
 	static t_node	*head;
 	t_node			*tmp;
+	int				result;
 
 	if (fd < 0 || !line)
 		return (ERROR);
 	if (!head)
-		head = create_el(fd);
+		head = create_node(fd);
 	tmp = head;
 	while (tmp->fd != fd)
 	{
 		if (tmp->next == NULL)
-			tmp->next = create_el(fd);
+			tmp->next = create_node(fd);
 		tmp = tmp->next;
 	}
-	return (get_line(fd, line, tmp->leftover));
+	if ((result = get_line(fd, line, tmp->leftover)) == READ_FINISHED)
+		delete_node(&head, tmp);
+	return (result);
 }
