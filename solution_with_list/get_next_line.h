@@ -20,14 +20,23 @@
 # define READ_FINISHED 0
 # define READ_NL 1
 
+typedef struct	s_node
+{
+	int				fd;
+	char			*leftover;
+	struct s_node	*next;
+}				t_node;
+
 int				get_next_line(int fd, char **line);
-char			*find_nl(char *remainder, char **new_line_point);
-char			*ft_strjoin(char const *s1, char const *s2);
+t_node			*create_node(int fd);
+void			delete_node(t_node **head, t_node *delete);
+char			*find_nl(char *leftover, char **new_line_point);
+int				get_line(int fd, char **line, char *leftover);
 
 char			*ft_strchr(const char *s, int c);
+char			*ft_strsub(char const *s, unsigned int start, size_t len);
 size_t			ft_strlen(const char *str);
-char			*ft_strcpy(char *dest, const char *src);
-char			*ft_strcat(char *dest, const char *src);
-char			*ft_strdup(const char *src);
+char			*ft_strjoin(char const *s1, char const *s2);
+char			*ft_1cpy_2cat(char *dest, const char *src, int code);
 
 #endif

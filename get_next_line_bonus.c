@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: osolodov <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 #ifndef BUFFER_SIZE
 # define BUFFER_SIZE 32
@@ -51,32 +51,71 @@ char	*ft_strjoin(char const *s1, char const *s2)
 ** that it will clear leftover (assuming that we reached EOF)
 */
 
-char	*find_nl(char *remainder, char **new_line_point)
+char	*find_nl(char *leftover, char **new_line_point)
 {
 	char		*str;
 	size_t		len;
 
 	str = NULL;
-	if (remainder)
+	if ((*new_line_point = ft_strchr(leftover, '\n')))
 	{
-		if ((str = ft_strchr(remainder, '\n')))
-		{
-			*str = '\0';
-			*new_line_point = ft_strdup(remainder);
-			ft_strcpy(remainder, ++str);
-		}
-		else
-		{
-			*new_line_point = ft_strdup(remainder);
-			len = ft_strlen(remainder);
-			if (remainder)
-				while (len)
-					remainder[len--] = 0;
-		}
+		str = ft_strsub(leftover, 0, *new_line_point - leftover);
+		ft_strcpy(leftover, ++(*new_line_point));
 	}
 	else
-		*new_line_point = (char *)malloc(sizeof(char) * 2);
+	{
+		len = ft_strlen(leftover);
+		if (!(str = (char *)malloc(sizeof(char) * len + 1)))
+			str = NULL;
+		ft_strcat(str, leftover);
+		if (leftover)
+			while (len)
+				leftover[len--] = 0;
+	}
 	return (str);
+}
+
+/*
+** Fn GET_LINE executes the main functionality of the program: first it calls
+** find_nl() fn which will pull the new line in case there was a leftover after
+** first execution of the program.
+**
+** If it is the first time execution and the result of the find_nl() call is
+** empty lines, the function starts reading the fd using read() fn call and
+** putting \0 either when it finished reading or if the BUFFER is full. Then it
+** looks for a \n in the BUFFER and after it finds on, it copies everything
+** after it into the leftover str and clears all the bytes before \n. After that
+** it attaches str in BUFFER (ending at new_line_point) to the *line str and
+** returns the code of execution.
+*/
+
+int		get_line(int fd, char **line, char *leftover)
+{
+	int		bytes_read;
+	char	buffer[BUFFER_SIZE + 1];
+	char	*new_line_point;
+	char	*tmp;
+	size_t	len;
+
+	new_line_point = NULL;
+	*line = find_nl(leftover, &new_line_point);
+	while (!new_line_point && (bytes_read = read(fd, buffer, BUFFER_SIZE)))
+	{
+		buffer[bytes_read] = '\0';
+		if ((new_line_point = ft_strchr(buffer, '\n')))
+		{
+			ft_strcpy(leftover, ++new_line_point);
+			len = ft_strlen(--new_line_point) - 1;
+			while (len--)
+				new_line_point[len] = 0;
+		}
+		tmp = *line;
+		if (!(*line = ft_strjoin(tmp, buffer)) || bytes_read < 0)
+			return (ERROR);
+		free(tmp);
+	}
+	return ((bytes_read || ft_strlen(*line)
+			|| ft_strlen(leftover)) ? READ_NL : READ_FINISHED);
 }
 
 /*
@@ -92,29 +131,17 @@ char	*find_nl(char *remainder, char **new_line_point)
 
 int		get_next_line(int fd, char **line)
 {
-	static char	*remainder;
-	char 		buff[BUFFER_SIZE + 1];
-	char		*new_line_point;
-	char		*tmp;
-	int			bytes_read;
+	static char		*str[4096];
+	int				result;
 
 	if (fd < 0 || !line || BUFFER_SIZE <= 0)
 		return (ERROR);
-	new_line_point = find_nl(remainder, line);
-	while (!new_line_point && (bytes_read = read(fd, buff, BUFFER_SIZE)))
+	if (!str[fd])
 	{
-		buff[bytes_read] = '\0';
-		if ((new_line_point = ft_strchr(buff, '\n')))
-		{
-			*new_line_point = '\0';
-			new_line_point++;
-			remainder = ft_strdup(new_line_point);
-		}
-		tmp = *line;
-		if (!(*line = ft_strjoin(tmp, buff)) || bytes_read < 0)
+		if (!(str[fd] = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1)))
 			return (ERROR);
-		free(tmp);
 	}
-	return ((bytes_read || ft_strlen(*line)
-			|| ft_strlen(remainder)) ? READ_NL : READ_FINISHED);
+	if ((result = get_line(fd, line, str[fd])) == READ_FINISHED)
+		free(str[fd]);
+	return (result);
 }
